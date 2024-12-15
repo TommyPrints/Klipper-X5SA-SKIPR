@@ -1,0 +1,669 @@
+# This file contains common pin mappings for TWO TREES T1
+# boards. To use this config, the firmware should be compiled for the
+# stm32f407. When running "make menuconfig", select the 48KiB
+# bootloader, and enable "Serial for communication" and select the "on USART1 PA10/PA9"
+
+# The "make flash" command does not work on the TWO TREES T1. Instead,
+# after running "make", copy the generated "out/klipper.bin" file to a
+# file named "mks_skipr.bin" on an SD card and then restart the
+# TWO TREES T1 with that SD card.
+# This file contains common pin mappings for TWO TREES T1
+# boards. To use this config, the firmware should be compiled for the
+# stm32f407. When running "make menuconfig", select the 48KiB
+# bootloader, and enable "Serial for communication" and select the "on USART1 PA10/PA9"
+
+# The "make flash" command does not work on the TWO TREES T1. Instead,
+# after running "make", copy the generated "out/klipper.bin" file to a
+# file named "mks_skipr.bin" on an SD card and then restart the
+# TWO TREES T1 with that SD card.
+
+# See docs/Config_Reference.md for a description of parameters.
+#[include MKS_THR.cfg]
+[include MCU_ID.cfg]
+[include custom.cfg]
+
+[stepper_x]
+step_pin:PC14
+dir_pin:!PC13
+enable_pin:!PC15
+microsteps: 16
+rotation_distance: 40
+full_steps_per_rotation:200  #set to 400 for 0.9 degree stepper
+endstop_pin:!PC1
+# endstop_pin:tmc2209_stepper_x:virtual_endstop
+position_min: 0
+position_endstop: 0
+position_max: 400
+homing_speed:80
+homing_retract_dist:5
+homing_positive_dir:false
+step_pulse_duration:0.000002
+
+[stepper_y]
+step_pin:PE5
+dir_pin:!PE4
+enable_pin:!PD14
+microsteps:16
+rotation_distance: 40
+full_steps_per_rotation:200  #set to 400 for 0.9 degree stepper
+endstop_pin:PA15
+# endstop_pin:tmc2209_stepper_y:virtual_endstop
+position_min: -10
+position_endstop:-10   
+position_max:400
+homing_speed:80
+homing_retract_dist:5
+homing_positive_dir:false
+step_pulse_duration:0.000002
+
+[stepper_z]
+step_pin:PE1
+dir_pin:PEO
+enable_pin: !PE2
+microsteps: 16
+rotation_distance: 8.12
+full_steps_per_rotation: 200
+# endstop_pin:PB8
+endstop_pin:probe:z_virtual_endstop
+##  Z-position of nozzle (in mm) to z-endstop trigger point relative to print surface (Z0)
+##  (+) value = endstop above Z0, (-) value = endstop below
+##	Increasing position_endstop brings nozzle closer to the bed
+##  After you run Z_ENDSTOP_CALIBRATE, position_endstop will be stored at the very end of your config
+# position_endstop:0 
+position_max: 400
+position_min: -10 
+homing_speed:30
+homing_retract_dist:10
+homing_retract_speed:10
+second_homing_speed:5
+homing_positive_dir:false
+
+[stepper_z1]
+step_pin:PD6
+dir_pin:PD5
+enable_pin:!PD7
+microsteps:16
+rotation_distance: 8.12
+full_steps_per_rotation: 200
+# gear_ratio: 80:16
+# endstop_pin:!PA13
+
+[extruder]
+step_pin:PB5
+dir_pin:!PB4
+enable_pin:!PB6
+microsteps:16
+rotation_distance: 8.136#7.137#31.4	#Bondtech 5mm Drive Gears
+#gear_ratio: 52:10
+full_steps_per_rotation: 200	#200 for 1.8 degree, 400 for 0.9 degree
+nozzle_diameter: 0.400
+filament_diameter: 1.750
+min_temp: -100
+max_temp: 330
+heater_pin: PB1
+sensor_type:EPCOS 100K B57560G104F
+sensor_pin: PC1
+max_power: 1
+#control :pid
+#pid_kp : 26.213 
+#pid_ki : 1.304
+#pid_kd : 131.721 
+pressure_advance: 0.02 #0.03
+pressure_advance_smooth_time: 0.005
+max_extrude_cross_section:0.64
+instantaneous_corner_velocity: 3.000 #5.000
+max_extrude_only_distance: 150
+max_extrude_only_velocity:500
+max_extrude_only_accel:1000
+step_pulse_duration:0.000002
+min_extrude_temp:170 #最低出料温度, 默认170
+smooth_time: 2.0
+
+[verify_heater extruder]
+max_error: 200
+check_gain_time:100
+hysteresis: 10
+heating_gain: 2
+
+[filament_switch_sensor fila]
+pause_on_runout: True
+runout_gcode:
+            SET_FILAMENT_SENSOR SENSOR=fila ENABLE=1
+event_delay: 3.0
+pause_delay: 0.5
+switch_pin: !PA13
+
+[heater_bed]
+heater_pin: PD12
+sensor_type: EPCOS 100K B57560G104F
+sensor_pin: PC0
+max_power: 1.0
+smooth_time: 2
+control = pid
+pid_kp = 72.765
+pid_ki = 1.287
+pid_kd = 1028.722
+min_temp: -100
+max_temp: 120
+
+
+[fan]
+pin:PA2
+# max_power: 1.0
+# shutdown_speed: 0
+# cycle_time: 0.010
+# hardware_pwm: False
+# kick_start_time: 0.100
+# off_below: 0.0
+
+[heater_fan throat]
+pin: PA1
+shutdown_speed: 1
+
+[controller_fan board]
+pin: PA0
+shutdown_speed: 1 
+
+# [output_pin LED]
+# pin: PA2
+# pwm: false
+# shutdown_value:1
+# value:0.0
+
+####################################################################
+#	Homing and Gantry Adjustment Routines
+#####################################################################
+[idle_timeout]
+timeout: 36000
+
+#####################################################################
+# 	Probe
+#####################################################################
+[probe]
+pin:!PB15
+x_offset: -40
+y_offset: -9
+#z_offset: 0
+speed: 10.0
+samples: 3
+samples_result: median
+sample_retract_dist: 5.0
+samples_tolerance: 0.05 # 当连续两次测出的误差相差大于此值时,重测,直到误差小于此值为止
+samples_tolerance_retries: 3
+
+# [bltouch]
+# sensor_pin:^PB8
+# control_pin:PA8
+# x_offset: -8.9
+# y_offset: 25.2
+# #z_offset: 
+# speed: 10.0
+# samples: 1
+# samples_result: median
+# sample_retract_dist: 3.0
+# samples_tolerance: 0.01
+# samples_tolerance_retries: 1
+
+[printer]
+kinematics:corexy #cartesian
+max_velocity: 500
+max_accel: 10000 #20000
+max_accel_to_decel: 5000
+max_z_velocity: 15
+max_z_accel: 200
+square_corner_velocity: 3.0 #5.0
+
+[tmc2209 stepper_x]
+uart_pin: PE6
+run_current: 1
+# hold_current: 1
+interpolate: True
+stealthchop_threshold:0
+# driver_SGTHRS:80
+# diag_pin:^PC0
+
+[tmc2209 stepper_y]
+uart_pin: PE3
+run_current: 1
+# hold_current: 1
+interpolate: True
+stealthchop_threshold:0
+# driver_SGTHRS:50
+# diag_pin:^PB8
+
+[tmc2209 stepper_z]
+uart_pin: PB7
+run_current: 1
+# hold_current: 1
+interpolate: True
+stealthchop_threshold: 99999
+
+[tmc2209 stepper_z1]
+uart_pin: PD4
+run_current: 1
+# hold_current: 1
+interpolate: True
+stealthchop_threshold: 99999
+
+[tmc2209 extruder]
+uart_pin: PB3
+run_current: 1
+hold_current: 1
+interpolate: True
+stealthchop_threshold: 0
+
+#####################################################################
+# 回零动作
+# ####################################################################
+[homing_override]
+set_position_z:0
+gcode: 
+    G91 
+    G1 Z5 F300
+    # {% set HOME_CUR = 0.350 %}
+    # {% set driver_config = printer.configfile.settings['tmc2209 stepper_x'] %}
+    # {% set RUN_CUR = driver_config.run_current %}
+    # SET_VELOCITY_LIMIT ACCEL=500
+    #   # Set current for sensorless homing
+    # SET_TMC_CURRENT STEPPER=stepper_x CURRENT={HOME_CUR}
+    # SET_TMC_CURRENT STEPPER=stepper_y CURRENT={HOME_CUR}
+    {% if params.X is defined %}
+    {% if params.Y is undefined %}
+    {% if params.Z is undefined %}
+    G28 X 
+    G1 X10 F1000
+    {% endif %}
+    {% endif %}
+    {% endif %}
+    {% if params.Y is defined %}
+    {% if params.X is undefined %}
+    {% if params.Z is undefined %}
+    G28 Y 
+    G1 Y0 F1000
+    {% endif %}
+    {% endif %}
+    {% endif %}
+    {% if params.X is undefined %}
+    {% if params.Y is undefined %}
+    {% if params.Z is defined %}
+    G28 X 
+    G1 X10 F1000
+    # {% set HOME_CUR = 0.350 %}
+    # SET_TMC_CURRENT STEPPER=stepper_y CURRENT={HOME_CUR}
+    G28 Y 
+    G1 Y0 F1000
+    G90
+    G1 X200 Y200 F2000
+    G28 Z
+    G91
+    {% endif %}
+    {% endif %}
+    {% endif %}
+    {% if params.X is defined %}
+    {% if params.Y is defined %}
+    {% if params.Z is undefined %}
+    G28 X 
+    G1 X10 F1000
+    # {% set HOME_CUR = 0.350 %}
+    # SET_TMC_CURRENT STEPPER=stepper_y CURRENT={HOME_CUR}
+    G28 Y 
+    G1 Y0 F1000
+    {% endif %}
+    {% endif %}
+    {% endif %}
+    {% if params.X is undefined %}
+    {% if params.Y is undefined %}
+    {% if params.Z is undefined %}
+    G28 X 
+    G1 X10 F1000
+    # {% set HOME_CUR = 0.350 %}
+    # SET_TMC_CURRENT STEPPER=stepper_y CURRENT={HOME_CUR}
+    G28 Y 
+    G1 Y0 F1000
+    G90
+    G1 X200 Y200 F2000
+    G28 Z
+    #Z_TILT
+    # Z_TILT_ADJUST # if [z_tilt] exist, uncomment it
+    #Z_TILT
+    G1 X200 Y200 F3000
+    G28 Z
+    G91
+    {% endif %}
+    {% endif %}
+    {% endif %} 
+    # SET_TMC_CURRENT STEPPER=stepper_x CURRENT={RUN_CUR}
+    # SET_TMC_CURRENT STEPPER=stepper_y CURRENT={RUN_CUR}
+    # SET_VELOCITY_LIMIT ACCEL=20000
+    G90
+    END_PRINT
+    # BED_MESH_PROFILE LOAD=default
+# [safe_z_home]
+# home_xy_position: 150, 150
+# speed: 80
+# z_hop: 10
+# z_hop_speed: 5
+
+
+# See the MKS Lcd Config path file for definitions of common LCD displays.
+
+[mcu rpi]
+serial: /tmp/klipper_host_mcu
+
+#[adxl345]
+#cs_pin:MKS_THR:gpio13
+#spi_software_sclk_pin: #MKS_THR:gpio14
+#spi_software_mosi_pin: #MKS_THR:gpio15
+#spi_software_miso_pin: #MKS_THR:gpio12
+#axes_map:x,-z,-y
+
+[adxl345]
+cs_pin: rpi:None
+spi_bus: spidev0.0
+#axes_map: x, z, -y
+
+[resonance_tester]
+accel_chip: adxl345
+probe_points:
+    200, 200, 20  # an example
+
+
+
+[input_shaper]
+shaper_freq_x: 36.2757 #68.4
+shaper_type_x: mzv
+shaper_freq_y: 37.8215 #45.6
+shaper_type_y: mzv
+
+[virtual_sdcard]
+path: ~/gcode_files
+#/home/mks/printer_data/gcodes
+
+[pause_resume]
+
+[display_status]
+
+[bed_mesh]
+speed:120                
+horizontal_move_z:10
+mesh_min:20,20  # 这里指调平器的绝对位置,必须保证加上偏移后喷嘴不超出xy的范围           
+mesh_max:360,360
+probe_count:6,6          
+algorithm:bicubic 
+bicubic_tension:0.5
+mesh_pps: 4, 4
+fade_start: 1
+fade_end: 10
+fade_target: 0  
+
+
+[gcode_macro PAUSE]
+rename_existing: BASE_PAUSE
+variable_pause_detected: 0
+gcode:
+    {% if pause_detected == 0 %}
+        M400 
+        {% set current_temp = printer.extruder.temperature %}
+        SET_GCODE_VARIABLE MACRO=RESUME VARIABLE=resume_temperature VALUE={current_temp}
+        SET_GCODE_VARIABLE MACRO=LOAD_MATERIAL VARIABLE=saved_temperature VALUE={current_temp}
+        SET_GCODE_VARIABLE MACRO=UNLOAD_MATERIAL VARIABLE=unsaved_temperature VALUE={current_temp}
+        {% set current_bed = printer["heater_bed"].temperature %}
+        SET_GCODE_VARIABLE MACRO=RESUME VARIABLE=resume_bed VALUE={current_bed}
+
+        {% set z = params.Z|default(10)|int %}                                                   
+        {% set e = params.E|default(2.5) %} 
+        SET_GCODE_VARIABLE MACRO=RESUME VARIABLE=zhop VALUE={z}                             
+        SET_GCODE_VARIABLE MACRO=RESUME VARIABLE=etemp VALUE={printer['extruder'].target}                                              
+        SAVE_GCODE_STATE NAME=PAUSE                                                                  
+        M25                                                                              
+        {% if (printer.gcode_move.position.z + z) < printer.toolhead.axis_maximum.z %}       
+        G91
+            M83
+            G1 E-{e} F2100
+        G1 Z{z} F900                                                                     
+        {% else %}
+        SET_GCODE_VARIABLE MACRO=RESUME VARIABLE=zhop VALUE=0
+        {% endif %}
+        SAVE_GCODE_STATE NAME=PAUSEPARK
+        G90                                                                                  
+        G1 X10 Y380 F6000
+        G1 E{e} F2100	
+        SET_IDLE_TIMEOUT TIMEOUT=43200        
+        SET_GCODE_VARIABLE MACRO=PAUSE VARIABLE=pause_detected VALUE=1
+        SET_GCODE_VARIABLE MACRO=LOAD_MATERIAL VARIABLE=load_detected VALUE=1
+        SET_GCODE_VARIABLE MACRO=UNLOAD_MATERIAL VARIABLE=unload_detected VALUE=1
+    {% endif %}
+
+
+[gcode_macro RESUME]
+rename_existing: BASE_RESUME
+variable_resume_temperature: 220
+variable_resume_bed: 60
+variable_zhop: 0
+variable_etemp: 0
+gcode:
+    M140 S{resume_bed}
+    {% if resume_temperature <= 190 %}  
+        M109 S220
+    {% else %}
+        M109 S{resume_temperature}
+    {% endif %}
+    {% set e = params.E|default(2.5)|int %}                                          
+    SET_IDLE_TIMEOUT TIMEOUT={printer.configfile.settings.idle_timeout.timeout}
+    G91                                                                               
+    M83
+	  G1 E-{e} F900		
+    RESTORE_GCODE_STATE NAME=PAUSEPARK MOVE=1 MOVE_SPEED=100                     
+    {% if printer[printer.toolhead.extruder].temperature >= printer.configfile.settings.extruder.min_extrude_temp %}                                                
+      G1 Z{zhop * -1} F900
+	    G1 E{e+0.5} F900	  
+    {% else %}                      
+      G1 Z{zhop * -1} F900                                                     
+    {% endif %}
+    M400
+    RESTORE_GCODE_STATE NAME=PAUSE MOVE=1 MOVE_SPEED=60 
+    M24
+    SET_GCODE_VARIABLE MACRO=PAUSE VARIABLE=pause_detected VALUE=0
+    # SET_FILAMENT_SENSOR SENSOR=fila ENABLE=1
+
+
+[gcode_macro CANCEL_PRINT]
+variable_runout_detected: 0
+rename_existing: BASE_CANCEL_PRINT
+gcode:
+    SET_IDLE_TIMEOUT TIMEOUT={printer.configfile.settings.idle_timeout.timeout} 
+    SDCARD_RESET_FILE
+    M400 							            ; wait for buffer to clear
+    G92 E0 							          ; zero the extruder
+    G1 E-1.0 F1200 				      ; retract filament
+    TURN_OFF_HEATERS
+    M107 							            ; turn off fan
+    G28 X0 Y0
+    M84
+    SET_GCODE_VARIABLE MACRO=PAUSE VARIABLE=pause_detected VALUE=0
+    SET_GCODE_VARIABLE MACRO=LOAD_MATERIAL VARIABLE=load_detected VALUE=0
+    SET_GCODE_VARIABLE MACRO=UNLOAD_MATERIAL VARIABLE=unload_detected VALUE=0
+
+[gcode_macro START_PRINT]
+gcode:
+    BED_MESH_PROFILE LOAD=default
+[gcode_macro PAUSEPARK]
+gcode:
+    M400
+[gcode_macro END_PRINT]
+gcode:
+    SET_GCODE_VARIABLE MACRO=PAUSE VARIABLE=pause_detected VALUE=0
+    SET_GCODE_VARIABLE MACRO=LOAD_MATERIAL VARIABLE=load_detected VALUE=0
+    SET_GCODE_VARIABLE MACRO=UNLOAD_MATERIAL VARIABLE=unload_detected VALUE=0
+
+[gcode_macro PRINT_START]         
+gcode:
+    SAVE_VARIABLE VARIABLE=was_interrupted VALUE=True
+    save_last_file
+    CLEAR_PAUSE
+    M117 Printing     
+    
+[gcode_macro PRINT_END]
+gcode:
+    SAVE_VARIABLE VARIABLE=was_interrupted VALUE=False
+    RUN_SHELL_COMMAND CMD=clear_plr
+    clear_last_file
+
+[gcode_macro INVERT]
+gcode:
+    {% if printer["output_pin caselight"].value == 0 %}
+    #{% if printer[printer.toolhead.extruder].target > 200 %}
+        SET_PIN PIN=caselight VALUE=1
+    {% else %}
+        SET_PIN PIN=caselight VALUE=0
+    {% endif %}
+
+
+[gcode_macro PUSH]
+gcode:
+    {% if printer[printer.toolhead.extruder].target <= 190%} 
+        M109 S240
+    {% else %}
+        M109 S{printer[printer.toolhead.extruder].target}
+    {% endif %}
+    {% if printer.extruder.temperature <= 190%} 
+        M109 S240
+    {% endif %}
+    M400
+    M83
+    G1 E180 F300 
+    M400
+
+
+[gcode_macro LOAD_MATERIAL]
+variable_load_detected: 0
+variable_saved_temperature: 240
+gcode:
+    SET_GCODE_VARIABLE MACRO=INSERT_FILA VARIABLE=insert_watchdog VALUE=1
+    SET_GCODE_VARIABLE MACRO=RUNOUT_FILA VARIABLE=runout_watchdog VALUE=1
+    SAVE_GCODE_STATE NAME=recovery_state
+    G92 E0  
+    PUSH
+    {% if load_detected == 1 %}
+        M104 S{saved_temperature}
+    {% else %}
+        M104 S0
+    {% endif %}
+    RESTORE_GCODE_STATE NAME=recovery_state
+    SET_GCODE_VARIABLE MACRO=INSERT_FILA VARIABLE=insert_watchdog VALUE=0
+    SET_GCODE_VARIABLE MACRO=RUNOUT_FILA VARIABLE=runout_watchdog VALUE=0
+    
+[gcode_macro UNLOAD_MATERIAL]
+variable_unload_detected: 0
+variable_unsaved_temperature: 240
+gcode:
+    SET_GCODE_VARIABLE MACRO=INSERT_FILA VARIABLE=insert_watchdog VALUE=1
+    SET_GCODE_VARIABLE MACRO=RUNOUT_FILA VARIABLE=runout_watchdog VALUE=1
+    SAVE_GCODE_STATE NAME=recovery_state
+    G92 E0  
+    {% if printer[printer.toolhead.extruder].target <= 190%} 
+        M109 S240
+    {% else %}
+        M109 S{printer[printer.toolhead.extruder].target}
+    {% endif %}
+    {% if printer.extruder.temperature <= 190%} 
+        M109 S240
+    {% endif %}
+
+    M400
+    M83
+    G1 E100 F300 
+    INVERT
+    G4 P20000
+    INVERT
+    M83
+    G1 E-30 F30
+    M83
+    G1 E-20 F1800
+    M83
+    G1 E-30 F300
+    M400
+    {% if unload_detected == 1 %}
+        M104 S{unsaved_temperature}
+    {% else %}
+        M104 S0
+    {% endif %}
+    RESTORE_GCODE_STATE NAME=recovery_state
+    SET_GCODE_VARIABLE MACRO=INSERT_FILA VARIABLE=insert_watchdog VALUE=0
+    SET_GCODE_VARIABLE MACRO=RUNOUT_FILA VARIABLE=runout_watchdog VALUE=0
+
+[gcode_macro G29]
+gcode:
+      BED_MESH_CLEAR
+      G28
+      BED_MESH_CALIBRATE
+      G0 X205 Y205 Z5 F3000
+      G0 Z0 F300
+      #######G2 G3 圆弧指令支持#######
+[gcode_arcs]
+#允许圆弧插补
+resolution: 1  
+#   一条弧线将被分割成若干段。每段的长度将
+#   等于上面设置的分辨率（mm）。更低的值会产生一个
+#   更细腻的弧线，但也会需要机器进行更多运算。小于
+#   配置值的曲线会被视为直线。
+#   默认为1毫米。
+#######对象排除支持#######
+[exclude_object]
+#启用对在打印过程中排除或取消单个对象的支持。3
+#EXCLUDE_OBJECT_START
+
+[display_status]
+#如果使用了display config 配置分段，display_status模块会自动加载。它提供了以下标准的G代码命令：
+#显示信息： M117 <message>
+#设置构建百分比：M73 P<percent>
+#还提供了以下扩展 G 语言命令：
+#SET_DISPLAY_TEXT MSG=<message>: Performs the equivalent of M117,
+# setting the supplied MSG as the current display message. 
+#If MSG is omitted the display will be cleared.
+
+[gcode_macro M205]
+description:设置拐角速度（抖动）
+#报错M205就把它复制进你的配置文件
+#M205（高级设置）（抖动设置相关）指令支持
+gcode:
+  {% if 'X' in params or 'Y' in params %}
+     {% set corner_speed = (params.X|default(params.Y)|float,
+         params.Y|default(params.X)|float)|min %}
+     SET_VELOCITY_LIMIT SQUARE_CORNER_VELOCITY={corner_speed}
+  {% else %}
+     SET_VELOCITY_LIMIT
+  {% endif %}
+
+#*# <---------------------- SAVE_CONFIG ---------------------->
+#*# DO NOT EDIT THIS BLOCK OR BELOW. The contents are auto-generated.
+#*#
+#*# [extruder]
+#*# control = pid
+#*# pid_kp = 23.219
+#*# pid_ki = 1.301
+#*# pid_kd = 103.613
+#*#
+#*# [bed_mesh default]
+#*# version = 1
+#*# points =
+#*# 	  0.806925, 0.456750, 0.058363, -0.337487, -0.768862, -1.235762
+#*# 	  0.730800, 0.421225, 0.060900, -0.319725, -0.723187, -1.172325
+#*# 	  0.669900, 0.367938, -0.020300, -0.378087, -0.740950, -1.185012
+#*# 	  0.669900, 0.352713, -0.048212, -0.411075, -0.768862, -1.197700
+#*# 	  0.682588, 0.357788, -0.086275, -0.477050, -0.784087, -1.192625
+#*# 	  0.593775, 0.246138, -0.205537, -0.593775, -0.850062, -1.195162
+#*# tension = 0.5
+#*# min_x = 20.0
+#*# algo = bicubic
+#*# y_count = 6
+#*# mesh_y_pps = 4
+#*# min_y = 20.0
+#*# x_count = 6
+#*# max_y = 360.0
+#*# mesh_x_pps = 4
+#*# max_x = 360.0
+#*#
+#*# [probe]
+#*# z_offset = 0.0
+
